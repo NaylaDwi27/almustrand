@@ -1,32 +1,14 @@
 import React, { useState } from 'react';
 import { ScrollView, StyleSheet, Text, View, Image, TouchableOpacity, TouchableWithoutFeedback, Modal, Alert, ImageBackground, TextInput, Button } from 'react-native';
 import { Notification, SearchNormal, Receipt21, Clock, Message, ArrowRight2, HambergerMenu, } from 'iconsax-react-native';
-import { fontType, colors } from './src/assets/theme';
+import { ItemGaleri } from './src/components';
+import { dataGaleri } from './data';
 
 const HomeScreen = () => {
-  const [isModalVisible, setIsModalVisible] = useState(false);
   const [searchText, setSearchText] = useState('');
 
   const handleSearchPress = (text) => {
     setSearchText(text);
-  };
-
-  const toggleModal = () => {
-    setIsModalVisible(!isModalVisible);
-  };
-
-  const handleProfilePress = () => {
-    toggleModal();
-  };
-
-  const handleEditProfile = () => {
-    toggleModal();
-    // Tambahkan kode untuk tindakan edit profil di sini
-  };
-
-  const handleLogout = () => {
-    toggleModal();
-    // Tambahkan kode untuk tindakan logout di sini
   };
   return (
     <View style={styles.container}>
@@ -34,13 +16,13 @@ const HomeScreen = () => {
         <View>
           <View style={styles.header}>
             <View style={styles.notificationContainer}>
-              <HambergerMenu color={colors.black()} variant="Linear" size={24} />
+              <HambergerMenu color={'black'} variant="Linear" size={24} />
             </View>
             <View style={styles.titleContainer}>
               <Text style={styles.title}>Almustrand</Text>
             </View>
             <View style={styles.notificationContainer}>
-              <Notification color={colors.black()} variant="Linear" size={24} />
+              <Notification color={'black'} variant="Linear" size={24} />
             </View>
           </View>
           <View style={styles.header}>
@@ -62,7 +44,7 @@ const HomeScreen = () => {
                 placeholderTextColor="gray"
               />
               <TouchableOpacity>
-                <SearchNormal color={colors.black()} variant="Linear" size={24} style={styles.icon} />
+                <SearchNormal color={'black'} variant="Linear" size={24} style={styles.icon} />
               </TouchableOpacity>
             </View>
           </View>
@@ -90,7 +72,7 @@ const AlatMusikPopuler = () => {
           <View style={{ ...itemPopuler.cardItem, marginLeft: 0, }}>
             <View style={{ position: 'absolute', bottom: 15, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 10, }}>
               <Text style={itemPopuler.cardMore}>Selengkapnya</Text>
-              <ArrowRight2 color={colors.black()} variant="Linear" size={20} />
+              <ArrowRight2 color={'black'} variant="Linear" size={20} />
             </View>
             <ImageBackground
               style={itemPopuler.cardImage}
@@ -104,7 +86,7 @@ const AlatMusikPopuler = () => {
               <View style={itemPopuler.cardContent}>
                 <View style={itemPopuler.textContainer}>
                   <Text style={itemPopuler.cardTitle}>Gamelan</Text>
-                  <Text style={itemPopuler.cardText}>Gamelan adalah musik ansambel tradisional di Indonesia yang memiliki tangga nada pentatonis dalam sistem tangga nada slendro dan pelog.</Text>
+                  <Text style={itemPopuler.cardText}>Gamelan adalah musik tradisional di Indonesia yang memiliki tangga nada pentatonis dalam sistem tangga nada slendro dan pelog.</Text>
                 </View>
               </View>
             </ImageBackground>
@@ -112,7 +94,7 @@ const AlatMusikPopuler = () => {
           <View style={{ ...itemPopuler.cardItem, marginLeft: 0, }}>
             <View style={{ position: 'absolute', bottom: 15, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 10, }}>
               <Text style={itemPopuler.cardMore}>Selengkapnya</Text>
-              <ArrowRight2 color={colors.black()} variant="Linear" size={20} />
+              <ArrowRight2 color={'black'} variant="Linear" size={20} />
             </View>
             <ImageBackground
               style={itemPopuler.cardImage}
@@ -142,38 +124,10 @@ const Galeri = () => {
     <View style={styles.headerGaleri}>
       <View style={styles.galeriTitleContainer}>
         <Text style={styles.textSeni}>Galeri</Text>
-        <ArrowRight2 color={colors.black()} variant="Linear" size={20} />
+        <ArrowRight2 color={'black'} variant="Linear" size={20} />
       </View>
       <View style={styles.listBlog}>
-        <ScrollView
-          showsHorizontalScrollIndicator={false}
-          horizontal
-          contentContainerStyle={{ gap: 20 }}>
-          <View style={{ ...itemGaleri.cardItem, marginLeft: 0 }}>
-            <ImageBackground
-              style={itemGaleri.cardImage}
-              resizeMode="cover"
-              imageStyle={{ borderRadius: 15 }}
-              source={{
-                uri: 'https://i.pinimg.com/564x/3a/c0/f1/3ac0f1379117074716655037b838b513.jpg',
-              }}
-            >
-              <View style={itemGaleri.darkOverlay}></View>
-            </ImageBackground>
-          </View>
-          <View style={{ ...itemGaleri.cardItem, marginLeft: 0 }}>
-            <ImageBackground
-              style={itemGaleri.cardImage}
-              resizeMode="cover"
-              imageStyle={{ borderRadius: 15 }}
-              source={{
-                uri: 'https://i.pinimg.com/564x/71/fe/0f/71fe0f5c000a66f99bb8a59678de6c3a.jpg',
-              }}
-            >
-              <View style={itemGaleri.darkOverlay}></View>
-            </ImageBackground>
-          </View>
-        </ScrollView>
+        <ItemGaleri data={dataGaleri} />
       </View>
     </View>
   );
@@ -184,7 +138,7 @@ const Berita = () => {
     <View style={styles.headerSeniDaerah}>
       <View style={styles.galeriTitleContainer}>
         <Text style={styles.textSeni}>Berita</Text>
-        <ArrowRight2 color={colors.black()} variant="Linear" size={20} />
+        <ArrowRight2 color={'black'} variant="Linear" size={20} />
       </View>
       <View style={beritaSeniRupa.listCard}>
         <View style={beritaSeniRupa.cardItem}>
@@ -211,7 +165,7 @@ const Berita = () => {
               <Clock
                 size={10}
                 variant="Linear"
-                color={colors.grey(0.6)}
+                color={'rgba(109, 125, 154, 0.6)'}
               />
               <Text style={beritaSeniRupa.cardText}>25 Agu 2023</Text>
             </View>
@@ -239,16 +193,16 @@ const beritaSeniRupa = StyleSheet.create({
     color: 'black',
     width: '35%',
     textAlign: 'center',
-    fontFamily: fontType['Pjs-Reguler'],
+
   },
   cardTitle: {
     fontSize: 14,
-    fontFamily: fontType['Pjs-Bold'],
-    color: colors.black(),
+
+    color: 'black',
   },
   cardText: {
     fontSize: 10,
-    fontFamily: fontType['Pjs-Medium'],
+
     color: 'rgba(255, 195, 11, 1)',
   },
   cardImage: {
@@ -316,136 +270,35 @@ const itemPopuler = StyleSheet.create({
     paddingRight: 8,
   },
   cardTitle: {
-    fontFamily: fontType['Pjs-Bold'],
+
     fontSize: 14,
-    color: colors.white(),
+    color: 'white',
   },
   cardMore: {
-    fontFamily: fontType['Pjs-Bold'],
+
     fontSize: 16,
     color: 'black',
     flex: 1,
   },
   cardText: {
     fontSize: 10,
-    color: colors.white(),
-    fontFamily: fontType['Pjs-Medium'],
-  },
-  cardIcon: {
-    backgroundColor: colors.black(0.5),
-    padding: 5,
-    borderColor: colors.white(),
-    borderWidth: 0.5,
-    borderRadius: 5,
-    width: 30,
-    height: 30,
-  },
-})
-const itemGaleri = StyleSheet.create({
-  cardItem: {
-    width: 'auto',
-  },
-  darkOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    width: '100%',
-    height: '100%',
-    backgroundColor: 'rgba(0, 0, 0, 0.2)',
-    borderRadius: 15,
-  },
-  cardImage: {
-    width: 300,
-    height: 200,
-    borderRadius: 5,
-  },
-  cardContent: {
-    flexDirection: 'row',
-    // justifyContent: 'flex-end',
-    padding: 15,
-    position: 'absolute',
-    bottom: 0,
-  },
-  cardInfo: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    height: '100%',
-    gap: 10,
-    maxWidth: '100%',
-  },
-  cardTextContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-    paddingTop: 8,
-  },
-  textContainer: {
-    flex: 1,
-    paddingRight: 8,
-  },
-  cardTitle: {
-    fontFamily: fontType['Pjs-Bold'],
-    fontSize: 14,
-    color: colors.white(),
-  },
-  cardText: {
-    fontSize: 10,
-    color: colors.white(),
-    fontFamily: fontType['Pjs-Medium'],
-  },
-  cardIcon: {
-    backgroundColor: colors.black(0.5),
-    padding: 5,
-    borderColor: colors.white(),
-    borderWidth: 0.5,
-    borderRadius: 5,
-    width: 30,
-    height: 30,
-  },
-})
-const itemSeniDaerah = StyleSheet.create({
-  cardItem: {
-    width: 'auto',
-  },
-  cardImage: {
-    width: 200,
-    height: 100,
-    borderRadius: 5,
-  },
-  cardContent: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    padding: 15,
-  },
-  cardInfo: {
-    justifyContent: 'flex-end',
-    height: '100%',
-    gap: 10,
-    maxWidth: '60%',
-  },
-  cardTitle: {
-    fontFamily: fontType['Pjs-Bold'],
-    fontSize: 14,
-    color: colors.white(),
-  },
-  cardText: {
-    fontSize: 10,
-    color: colors.white(),
-    fontFamily: fontType['Pjs-Medium'],
-  },
-  cardIcon: {
-    backgroundColor: colors.white(0.33),
-    padding: 5,
-    borderColor: colors.white(),
-    borderWidth: 0.5,
-    borderRadius: 5,
-  },
-});
+    color: 'white',
 
+  },
+  cardIcon: {
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    padding: 5,
+    borderColor: 'white',
+    borderWidth: 0.5,
+    borderRadius: 5,
+    width: 30,
+    height: 30,
+  },
+})
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.white(),
+    backgroundColor: 'white',
   },
   headerGaleri: {
     paddingHorizontal: 24,
@@ -470,20 +323,18 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 20,
-    fontFamily: fontType['Pjs-ExtraBold'],
-    color: colors.black(),
+    color: 'black',
   },
   welcomeText: {
     fontSize: 16,
     marginRight: 20,
-    fontFamily: fontType['Pjs-ExtraBold'],
-    color: colors.black(),
+    color: 'black',
   },
   textSeni: {
     fontSize: 20,
     marginRight: 8,
-    fontFamily: fontType['Pjs-ExtraBold'],
-    color: colors.black(),
+
+    color: 'black',
   },
   profileImage: {
     width: 40,
@@ -521,21 +372,5 @@ const styles = StyleSheet.create({
   },
 
 });
-const category = StyleSheet.create({
-  item: {
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    borderRadius: 25,
-    alignItems: 'center',
-    backgroundColor: colors.grey(0.08),
-    marginHorizontal: 5
-  },
-  title: {
-    fontFamily: fontType['Pjs-SemiBold'],
-    fontSize: 14,
-    lineHeight: 18,
-    color: colors.grey(),
-  },
-})
 
 export default HomeScreen;
