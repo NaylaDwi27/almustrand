@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { ScrollView, StyleSheet, Text, View, Image, TouchableOpacity, ImageBackground, TextInput, Button } from 'react-native';
 import { Notification, SearchNormal, Clock, ArrowRight2, HambergerMenu, } from 'iconsax-react-native';
-import { ItemGaleri } from '../../components';
-import { dataGaleri } from '../../../data';
+import { ItemAlatPopuler, ItemGaleri } from '../../components';
+import { dataAlatPopuler, dataGaleri } from '../../../data';
 
 const HomeScreen = () => {
   const [searchText, setSearchText] = useState('');
@@ -65,55 +65,7 @@ const AlatMusikPopuler = () => {
       </View>
 
       <View style={styles.listBlog}>
-        <ScrollView
-          showsHorizontalScrollIndicator={false}
-          horizontal
-          contentContainerStyle={{ gap: 20 }}>
-          <View style={{ ...itemPopuler.cardItem, marginLeft: 0, }}>
-            <View style={{ position: 'absolute', bottom: 15, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 10, }}>
-              <Text style={itemPopuler.cardMore}>Selengkapnya</Text>
-              <ArrowRight2 color={'black'} variant="Linear" size={20} />
-            </View>
-            <ImageBackground
-              style={itemPopuler.cardImage}
-              resizeMode="cover"
-              imageStyle={{ borderRadius: 15 }}
-              source={{
-                uri: 'https://i.pinimg.com/736x/7e/0d/a9/7e0da932ed99c04c700899f6bb7f659e.jpg',
-              }}
-            >
-              <View style={itemPopuler.darkOverlay}></View>
-              <View style={itemPopuler.cardContent}>
-                <View style={itemPopuler.textContainer}>
-                  <Text style={itemPopuler.cardTitle}>Gamelan</Text>
-                  <Text style={itemPopuler.cardText}>Gamelan adalah musik tradisional di Indonesia yang memiliki tangga nada pentatonis dalam sistem tangga nada slendro dan pelog.</Text>
-                </View>
-              </View>
-            </ImageBackground>
-          </View>
-          <View style={{ ...itemPopuler.cardItem, marginLeft: 0, }}>
-            <View style={{ position: 'absolute', bottom: 15, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 10, }}>
-              <Text style={itemPopuler.cardMore}>Selengkapnya</Text>
-              <ArrowRight2 color={'black'} variant="Linear" size={20} />
-            </View>
-            <ImageBackground
-              style={itemPopuler.cardImage}
-              resizeMode="cover"
-              imageStyle={{ borderRadius: 15 }}
-              source={{
-                uri: 'https://i.pinimg.com/564x/a8/ee/46/a8ee46db1a0483d7d8438c938d9b7afc.jpg',
-              }}
-            >
-              <View style={itemPopuler.darkOverlay}></View>
-              <View style={itemPopuler.cardContent}>
-                <View style={itemPopuler.textContainer}>
-                  <Text style={itemPopuler.cardTitle}>Angklung</Text>
-                  <Text style={itemPopuler.cardText}>Alat musik ini dibuat dari bambu, dibunyikan dengan cara digoyangkan sehingga menghasilkan bunyi yang bergetar dalam susunan nada 2, 3, sampai 4 nada dalam setiap ukuran, baik besar maupun kecil.</Text>
-                </View>
-              </View>
-            </ImageBackground>
-          </View>
-        </ScrollView>
+        <ItemAlatPopuler data={dataAlatPopuler} />
       </View>
     </View>
   );

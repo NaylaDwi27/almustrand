@@ -1,2 +1,3 @@
 import ItemGaleri from './itemGaleri';
-export { ItemGaleri };
+import ItemAlatPopuler from './itemAlatPopuler';
+export { ItemGaleri, ItemAlatPopuler };
