@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, Text, Image, FlatList, StyleSheet, TouchableOpacity, TextInput, ImageBackground } from 'react-native';
+import React, { useState, useRef } from 'react';
+import { Animated, View, Text, Image, FlatList, StyleSheet, TouchableOpacity, TextInput, ImageBackground } from 'react-native';
 import { dataFeed, dataGaleri, dataKategori } from '../../../data';
 import { Heart, SearchNormal } from 'iconsax-react-native';
 
@@ -51,6 +51,12 @@ const FlatListCategory = () => {
 };
 
 const FeedScreen = () => {
+  const scrollY = useRef(new Animated.Value(0)).current;
+  const diffClampY = Animated.diffClamp(scrollY, 0, 120);
+  const headerY = diffClampY.interpolate({
+    inputRange: [0, 120],
+    outputRange: [0, -120],
+  });
   const [searchText, setSearchText] = useState('');
 
   const handleSearchPress = (text) => {
@@ -58,25 +64,36 @@ const FeedScreen = () => {
   };
   return (
     <View style={styles.container}>
-      <View style={{ marginTop: 10, paddingHorizontal: 24, }}>
-        <View style={styles.searchContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder="Cari Sesuatu"
-            onChangeText={handleSearchPress}
-            value={searchText}
-            placeholderTextColor="gray"
-          />
-          <TouchableOpacity>
-            <SearchNormal color={'black'} variant="Linear" size={24} style={styles.icon} />
-          </TouchableOpacity>
+      <Animated.View style={[styles.header, { transform: [{ translateY: headerY }] }]}>
+        <View style={{ marginTop: 10, paddingHorizontal: 24, }}>
+          <View style={styles.searchContainer}>
+            <TextInput
+              style={styles.input}
+              placeholder="Cari Sesuatu"
+              onChangeText={handleSearchPress}
+              value={searchText}
+              placeholderTextColor="gray"
+            />
+            <TouchableOpacity>
+              <SearchNormal color={'black'} variant="Linear" size={24} style={styles.icon} />
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
-      <View style={{ paddingVertical: 10, paddingHorizontal: 24, }}>
-        <FlatListCategory />
-      </View>
+        <View style={{ paddingVertical: 10, paddingHorizontal: 24, }}>
+          <FlatListCategory />
+        </View>
+      </Animated.View>
       <View style={{ paddingHorizontal: 20, }}>
-        <FlatList
+        <Animated.FlatList
+          onScroll={Animated.event(
+            [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+            { useNativeDriver: true },
+          )}
+          contentContainerStyle={{
+            // paddingHorizontal: 24,
+            paddingTop: 120,
+            // paddingBottom: 54,
+          }}
           data={dataFeed}
           keyExtractor={(item) => item.id}
           numColumns={2}
@@ -113,6 +130,18 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     width: 35,
     height: 35,
+  },
+  header: {
+    // paddingHorizontal: 24,
+    // height: 52,
+    paddingTop: 8,
+    paddingBottom: 4,
+    position: 'absolute',
+    zIndex: 1000,
+    top: 0,
+    right: 0,
+    left: 0,
+    backgroundColor: 'white',
   },
   searchContainer: {
     flexDirection: 'row',
