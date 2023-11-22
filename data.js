@@ -32,30 +32,51 @@ export const dataFeed = [
   {
     id: 1,
     image: 'https://i.pinimg.com/564x/3a/c0/f1/3ac0f1379117074716655037b838b513.jpg',
+    title: 'Lorem Ipsum',
+    description: 'Gambar diatas adalah lorem ipsum blablabla....',
+    category: 'Alat Musik Jawa'
   },
   {
     id: 2,
     image: 'https://i.pinimg.com/564x/71/fe/0f/71fe0f5c000a66f99bb8a59678de6c3a.jpg',
+    title: 'Lorem Ipsum',
+    description: 'Gambar diatas adalah lorem ipsum blablabla....',
+    category: 'Alat Musik Jawa'
   },
   {
     id: 3,
     image: 'https://i.pinimg.com/564x/3a/c0/f1/3ac0f1379117074716655037b838b513.jpg',
+    title: 'Lorem Ipsum',
+    description: 'Gambar diatas adalah lorem ipsum blablabla....',
+    category: 'Alat Musik Jawa'
   },
   {
     id: 4,
     image: 'https://i.pinimg.com/564x/71/fe/0f/71fe0f5c000a66f99bb8a59678de6c3a.jpg',
+    title: 'Lorem Ipsum',
+    description: 'Gambar diatas adalah lorem ipsum blablabla....',
+    category: 'Alat Musik Jawa'
   },
   {
     id: 5,
     image: 'https://i.pinimg.com/564x/3a/c0/f1/3ac0f1379117074716655037b838b513.jpg',
+    title: 'Lorem Ipsum',
+    description: 'Gambar diatas adalah lorem ipsum blablabla....',
+    category: 'Alat Musik Jawa'
   },
   {
     id: 6,
     image: 'https://i.pinimg.com/564x/71/fe/0f/71fe0f5c000a66f99bb8a59678de6c3a.jpg',
+    title: 'Lorem Ipsum',
+    description: 'Gambar diatas adalah lorem ipsum blablabla....',
+    category: 'Alat Musik Jawa'
   },
   {
     id: 7,
     image: 'https://i.pinimg.com/564x/3a/c0/f1/3ac0f1379117074716655037b838b513.jpg',
+    title: 'Lorem Ipsum',
+    description: 'Gambar diatas adalah lorem ipsum blablabla....',
+    category: 'Alat Musik Jawa'
   },
 ];
 export const dataAlatPopuler = [

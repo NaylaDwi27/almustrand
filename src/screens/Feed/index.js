@@ -1,7 +1,8 @@
 import React, { useState, useRef } from 'react';
 import { Animated, View, Text, Image, FlatList, StyleSheet, TouchableOpacity, TextInput, ImageBackground } from 'react-native';
 import { dataFeed, dataGaleri, dataKategori } from '../../../data';
-import { Heart, SearchNormal } from 'iconsax-react-native';
+import { Heart, SearchNormal, Add } from 'iconsax-react-native';
+import { useNavigation } from "@react-navigation/native";
 
 const Card = ({ title, image }) => (
   <View style={styles.card}>
@@ -51,6 +52,7 @@ const FlatListCategory = () => {
 };
 
 const FeedScreen = () => {
+const navigation = useNavigation();
   const scrollY = useRef(new Animated.Value(0)).current;
   const diffClampY = Animated.diffClamp(scrollY, 0, 120);
   const headerY = diffClampY.interpolate({
@@ -100,6 +102,12 @@ const FeedScreen = () => {
           renderItem={({ item }) => <Card title={item.title} image={item.image} />}
         />
       </View>
+      <TouchableOpacity
+        style={styles.floatingButton}
+        onPress={() => navigation.navigate("AddFeed")}
+      >
+        <Add color={'white'} variant="Linear" size={20} />
+      </TouchableOpacity>
     </View>
   );
 };
@@ -109,6 +117,23 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'white',
     paddingBottom: 60,
+  },
+  floatingButton: {
+    backgroundColor: 'rgba(255, 195, 11, 1)',
+    padding: 15,
+    position: 'absolute',
+    bottom: 80,
+    right: 24,
+    borderRadius: 10,
+    shadowColor: 'blue',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 4.65,
+
+    elevation: 8,
   },
   darkOverlay: {
     position: 'absolute',
