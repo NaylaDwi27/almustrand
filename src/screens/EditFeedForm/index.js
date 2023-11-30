@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -12,17 +12,61 @@ import { ArrowLeft } from "iconsax-react-native";
 import { useNavigation } from "@react-navigation/native";
 import axios from 'axios';
 
-const AddFeedForm = () => {
+const EditFeedForm = ({route}) => {
+  const { blogId } = route.params;
   const [loading, setLoading] = useState(false);
-  const handleUpload = async () => {
+  const dataCategory = [
+    { id: 1, name: "Alat Musik Jawa" },
+    { id: 2, name: "Alat Musik Kalimantan" },
+    { id: 3, name: "Alat Musik Papua" },
+    { id: 4, name: "Alat Musik NTT" },
+  ];
+  const [feedData, setFeedData] = useState({
+    title: "",
+    content: "",
+    category: {},
+  });
+  const handleChange = (key, value) => {
+    setFeedData({
+      ...feedData,
+      [key]: value,
+    });
+  };
+  const [image, setImage] = useState(null);
+  const navigation = useNavigation();
+  useEffect(() => {
+    getBlogById();
+  }, [blogId]);
+
+  const getBlogById = async () => {
+    try {
+      const response = await axios.get(
+        `https://6567ff729927836bd973fac3.mockapi.io/Almustrand/DataFeed/${blogId}`,
+      );
+      setFeedData({
+        title: response.data.title,
+        content: response.data.description,
+        category: {
+          id: response.data.category.id,
+          name: response.data.category.name
+        }
+      })
+      setImage(response.data.image)
+      setLoading(false);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  const handleUpdate = async () => {
     setLoading(true);
     try {
-      await axios.post('https://6567ff729927836bd973fac3.mockapi.io/Almustrand/DataFeed', {
-        image,
-        title: feedData.title,
-        description: feedData.content,
-        category: feedData.category,
-      })
+      await axios
+        .put(`https://6567ff729927836bd973fac3.mockapi.io/Almustrand/DataFeed/${blogId}`, {
+          image,
+          title: feedData.title,
+          description: feedData.content,
+          category: feedData.category,
+        })
         .then(function (response) {
           console.log(response);
         })
@@ -35,25 +79,6 @@ const AddFeedForm = () => {
       console.log(e);
     }
   };
-  const dataCategory = [
-    { id: 1, name: "Alat Musik Jawa" },
-    { id: 2, name: "Alat Musik Kalimantan" },
-    { id: 3, name: "Alat Musik Papua" },
-    { id: 4, name: "Alat Musik NTT" },
-  ];
-  const [feedData, setBlogData] = useState({
-    title: "",
-    content: "",
-    category: {},
-  });
-  const handleChange = (key, value) => {
-    setBlogData({
-      ...feedData,
-      [key]: value,
-    });
-  };
-  const [image, setImage] = useState(null);
-  const navigation = useNavigation();
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -61,7 +86,7 @@ const AddFeedForm = () => {
           <ArrowLeft color={'black'} variant="Linear" size={24} />
         </TouchableOpacity>
         <View style={{ flex: 1, alignItems: "center" }}>
-          <Text style={styles.title}>Tambahkan Feed Baru</Text>
+          <Text style={styles.title}>Edit Feed</Text>
         </View>
       </View>
       <ScrollView
@@ -138,8 +163,8 @@ const AddFeedForm = () => {
         </View>
       </ScrollView>
       <View style={styles.bottomBar}>
-        <TouchableOpacity style={styles.button} onPress={handleUpload}>
-          <Text style={styles.buttonLabel}>Upload</Text>
+        <TouchableOpacity style={styles.button} onPress={handleUpdate}>
+          <Text style={styles.buttonLabel}>Update</Text>
         </TouchableOpacity>
       </View>
       {loading && (
@@ -151,7 +176,7 @@ const AddFeedForm = () => {
   );
 };
 
-export default AddFeedForm;
+export default EditFeedForm;
 
 const styles = StyleSheet.create({
   container: {

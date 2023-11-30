@@ -1,21 +1,25 @@
-import React, { useState, useRef } from 'react';
-import { Animated, View, Text, Image, FlatList, StyleSheet, TouchableOpacity, TextInput, ImageBackground } from 'react-native';
+import React, { useState, useRef, useCallback } from 'react';
+import { Animated, View, Text, Image, FlatList, StyleSheet, TouchableOpacity, TextInput, ImageBackground, ActivityIndicator, RefreshControl } from 'react-native';
 import { dataFeed, dataGaleri, dataKategori } from '../../../data';
 import { Heart, SearchNormal, Add } from 'iconsax-react-native';
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
+import axios from 'axios';
 
-const Card = ({ title, image }) => (
-  <View style={styles.card}>
-    <ImageBackground source={{ uri: image }} style={styles.cardImage}>
-      <View style={styles.darkOverlay}></View>
-      <View style={styles.cardIcon}>
-        <TouchableOpacity>
-          <Heart color='red' size={25} variant='Linear' />
-        </TouchableOpacity>
-      </View>
-    </ImageBackground>
-  </View>
-);
+const Card = ({ id, title, image }) => {
+  const navigation = useNavigation();
+  return (
+    <TouchableOpacity style={styles.card} onPress={() => navigation.navigate('AlatPopulerDetail', { blogId: id })}>
+      <ImageBackground source={{ uri: image }} style={styles.cardImage}>
+        <View style={styles.darkOverlay}></View>
+        <View style={styles.cardIcon}>
+          <TouchableOpacity>
+            <Heart color='red' size={25} variant='Linear' />
+          </TouchableOpacity>
+        </View>
+      </ImageBackground>
+    </TouchableOpacity>
+  )
+}
 
 const ItemCategory = ({ item, onPress, color }) => {
   return (
@@ -52,7 +56,35 @@ const FlatListCategory = () => {
 };
 
 const FeedScreen = () => {
-const navigation = useNavigation();
+  const navigation = useNavigation();
+  const [loading, setLoading] = useState(true);
+  const [feedData, setFeedData] = useState([]);
+  const [refreshing, setRefreshing] = useState(false);
+  const getFeedData = async () => {
+    try {
+      const response = await axios.get(
+        'https://6567ff729927836bd973fac3.mockapi.io/Almustrand/DataFeed',
+      );
+      setFeedData(response.data);
+      setLoading(false)
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    setTimeout(() => {
+      getFeedData()
+      setRefreshing(false);
+    }, 1500);
+  }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      getFeedData();
+    }, [])
+  );
   const scrollY = useRef(new Animated.Value(0)).current;
   const diffClampY = Animated.diffClamp(scrollY, 0, 120);
   const headerY = diffClampY.interpolate({
@@ -85,23 +117,26 @@ const navigation = useNavigation();
           <FlatListCategory />
         </View>
       </Animated.View>
-      <View style={{ paddingHorizontal: 20, }}>
-        <Animated.FlatList
-          onScroll={Animated.event(
-            [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-            { useNativeDriver: true },
-          )}
-          contentContainerStyle={{
-            // paddingHorizontal: 24,
-            paddingTop: 120,
-            // paddingBottom: 54,
-          }}
-          data={dataFeed}
-          keyExtractor={(item) => item.id}
-          numColumns={2}
-          renderItem={({ item }) => <Card title={item.title} image={item.image} />}
-        />
-      </View>
+      <Animated.ScrollView
+        onScroll={Animated.event(
+          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+          { useNativeDriver: true },
+        )}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh}/>
+        }
+        contentContainerStyle={{
+          paddingHorizontal: 16,
+          paddingTop: 120,
+          // paddingBottom: 54,
+        }}>
+        {loading ? (<ActivityIndicator size={'large'} color={'rgba(255, 195, 11, 1)'} />) :
+          (
+            feedData.map((item, index) => <Card id={item.id} title={item.title} image={item.image} key={index} />)
+          )
+        }
+
+      </Animated.ScrollView>
       <TouchableOpacity
         style={styles.floatingButton}
         onPress={() => navigation.navigate("AddFeed")}

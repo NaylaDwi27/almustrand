@@ -1,12 +1,55 @@
-import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Image } from 'react-native';
-import React, { useState } from 'react';
+import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
 import { ArrowLeft, Like1, Receipt21, Message, Share, More, Clipboard, ClipboardText, Paperclip, Paperclip2, DocumentDownload } from 'iconsax-react-native';
 import { useNavigation } from '@react-navigation/native';
 import { dataAlatPopuler } from '../../../data';
+import axios from 'axios';
+import ActionSheet from 'react-native-actions-sheet';
+
 const AlatPopulerDetail = ({ route }) => {
   const { blogId } = route.params;
-  const selectedBlog = dataAlatPopuler.find(blog => blog.id === blogId);
+  const [selectedBlog, setSelectedBlog] = useState(null);
+  const [loading, setLoading] = useState(true);
   const navigation = useNavigation();
+  const actionSheetRef = useRef(null);
+
+  const openActionSheet = () => {
+    actionSheetRef.current?.show();
+  };
+
+  const closeActionSheet = () => {
+    actionSheetRef.current?.hide();
+  };
+  useEffect(() => {
+    getBlogById();
+  }, [blogId]);
+
+  const getBlogById = async () => {
+    try {
+      const response = await axios.get(
+        `https://6567ff729927836bd973fac3.mockapi.io/Almustrand/DataFeed/${blogId}`,
+      );
+      setSelectedBlog(response.data);
+      setLoading(false);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const navigateEdit = () => {
+    closeActionSheet()
+    navigation.navigate('EditFeed', { blogId })
+  }
+  const handleDelete = async () => {
+    await axios.delete(`https://6567ff729927836bd973fac3.mockapi.io/Almustrand/DataFeed/${blogId}`)
+      .then(() => {
+        closeActionSheet()
+        navigation.navigate('Explore');
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -18,7 +61,9 @@ const AlatPopulerDetail = ({ route }) => {
           />
         </TouchableOpacity>
       </View>
-      <ScrollView
+      {loading ? (<View style={{ justifyContent: 'center', alignItems: 'center', flex: 1 }}>
+        <ActivityIndicator size={'large'} color={'rgba(255, 195, 11, 1)'} />
+      </View>) : (<ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
           paddingHorizontal: 24,
@@ -32,16 +77,80 @@ const AlatPopulerDetail = ({ route }) => {
               uri: selectedBlog.image,
             }}
             resizeMode={'cover'} />
-          <More
-            color={'black'}
-            variant="Linear"
-          />
+          <TouchableOpacity onPress={openActionSheet}>
+            <More
+              color={'black'}
+              variant="Linear"
+            />
+          </TouchableOpacity>
           <DocumentDownload color={'black'} variant="Linear" size={24} />
           <Paperclip2 color={'black'} variant="Linear" size={24} />
         </View>
-        <Text style={styles.title}>{selectedBlog.name}</Text>
+        <Text style={styles.title}>{selectedBlog.title}</Text>
         <Text style={styles.content}>{selectedBlog.description}</Text>
-      </ScrollView>
+      </ScrollView>)
+      }
+      <ActionSheet
+        ref={actionSheetRef}
+        containerStyle={{
+          borderTopLeftRadius: 25,
+          borderTopRightRadius: 25,
+        }}
+        indicatorStyle={{
+          width: 100,
+        }}
+        gestureEnabled={true}
+        defaultOverlayOpacity={0.3}>
+        <TouchableOpacity
+          style={{
+            justifyContent: 'center',
+            alignItems: 'center',
+            paddingVertical: 15,
+          }}
+          onPress={navigateEdit}
+        >
+          <Text
+            style={{
+
+              color: 'black',
+              fontSize: 18,
+            }}>
+            Edit
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={{
+            justifyContent: 'center',
+            alignItems: 'center',
+            paddingVertical: 15,
+          }}
+          onPress={handleDelete}>
+          <Text
+            style={{
+
+              color: 'black',
+              fontSize: 18,
+            }}>
+            Delete
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={{
+            justifyContent: 'center',
+            alignItems: 'center',
+            paddingVertical: 15,
+          }}
+          onPress={closeActionSheet}>
+          <Text
+            style={{
+
+              color: 'red',
+              fontSize: 18,
+            }}>
+            Cancel
+          </Text>
+        </TouchableOpacity>
+      </ActionSheet>
     </View>
   );
 };
