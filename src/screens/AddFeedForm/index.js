@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -6,34 +6,73 @@ import {
   TouchableOpacity,
   StyleSheet,
   ScrollView,
-  ActivityIndicator
+  ActivityIndicator,
+  Image
 } from "react-native";
-import { ArrowLeft } from "iconsax-react-native";
+import { ArrowLeft, AddSquare, Add } from "iconsax-react-native";
 import { useNavigation } from "@react-navigation/native";
 import axios from 'axios';
+import ImagePicker from 'react-native-image-crop-picker';
+import storage from '@react-native-firebase/storage';
+import firestore from '@react-native-firebase/firestore';
 
 const AddFeedForm = () => {
+  const handleImagePick = async () => {
+    ImagePicker.openPicker({
+      width: 1000,
+      height: 1000,
+      cropping: true,
+    })
+      .then(image => {
+        console.log(image);
+        setImage(image.path);
+      })
+      .catch(error => {
+        console.log(error);
+      });
+  };
   const [loading, setLoading] = useState(false);
   const handleUpload = async () => {
+    let filename = image.substring(image.lastIndexOf('/') + 1);
+    const extension = filename.split('.').pop();
+    const name = filename.split('.').slice(0, -1).join('.');
+    filename = name + Date.now() + '.' + extension;
+    const reference = storage().ref(`feedimages/${filename}`);
+
     setLoading(true);
     try {
-      await axios.post('https://6567ff729927836bd973fac3.mockapi.io/Almustrand/DataFeed', {
-        image,
+      await reference.putFile(image);
+      const url = await reference.getDownloadURL();
+      await firestore().collection('feed').add({
+        image: url,
         title: feedData.title,
         description: feedData.content,
         category: feedData.category,
-      })
-        .then(function (response) {
-          console.log(response);
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
+      });
       setLoading(false);
+      console.log('Feed added!');
       navigation.navigate('Explore');
-    } catch (e) {
-      console.log(e);
-    }
+    } catch (error) {
+      console.log(error);
+    };
+    // try {
+    //   await axios.post('https://6567ff729927836bd973fac3.mockapi.io/Almustrand/DataFeed', {
+    //     image,
+    //     title: feedData.title,
+    //     description: feedData.content,
+    //     category: feedData.category,
+    //   })
+    //     .then(function (response) {
+    //       console.log(response);
+    //     })
+    //     .catch(function (error) {
+    //       console.log(error);
+    //     });
+    //   setLoading(false);
+    //   navigation.navigate('Explore');
+    // } catch (e) {
+    //   console.log(e);
+    // }
   };
   const dataCategory = [
     { id: 1, name: "Alat Musik Jawa" },
@@ -92,15 +131,6 @@ const AddFeedForm = () => {
           />
         </View>
         <View style={[textInput.borderInput]}>
-          <TextInput
-            placeholder="Image"
-            value={image}
-            onChangeText={(text) => setImage(text)}
-            placeholderTextColor={'rgba(128, 128, 128, 0.6)'}
-            style={textInput.content}
-          />
-        </View>
-        <View style={[textInput.borderInput]}>
           <Text
             style={{
               fontSize: 12,
@@ -136,6 +166,56 @@ const AddFeedForm = () => {
             })}
           </View>
         </View>
+        {image ? (
+          <View style={{ position: 'relative' }}>
+            <Image
+              style={{ width: '100%', height: 127, borderRadius: 5 }}
+              source={{
+                uri: image,
+              }}
+              resizeMode={'cover'}
+            />
+            <TouchableOpacity
+              style={{
+                position: 'absolute',
+                top: -5,
+                right: -5,
+                backgroundColor: 'rgba(255, 195, 11, 1)',
+                borderRadius: 25,
+              }}
+              onPress={() => setImage(null)}>
+              <Add
+                size={20}
+                variant="Linear"
+                color={'white'}
+                style={{ transform: [{ rotate: '45deg' }] }}
+              />
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <TouchableOpacity onPress={handleImagePick}>
+            <View
+              style={[
+                textInput.borderInput,
+                {
+                  gap: 10,
+                  paddingVertical: 30,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                },
+              ]}>
+              <AddSquare color={'rgba(128, 128, 128, 0.6)'} variant="Linear" size={42} />
+              <Text
+                style={{
+
+                  fontSize: 12,
+                  color: 'rgba(128, 128, 128, 0.6)',
+                }}>
+                Upload Foto
+              </Text>
+            </View>
+          </TouchableOpacity>
+        )}
       </ScrollView>
       <View style={styles.bottomBar}>
         <TouchableOpacity style={styles.button} onPress={handleUpload}>

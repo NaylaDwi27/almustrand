@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1001716152080",
+    "project_id": "almustrand",
+    "storage_bucket": "almustrand.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1001716152080:android:818dfb9508e26149d05795",
+        "android_client_info": {
+          "package_name": "com.almustrand"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBgoyRJ0UQ_aEFQEJW-SCUWRXAT-aWv7dQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

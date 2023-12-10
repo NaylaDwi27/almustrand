@@ -1,9 +1,10 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { Animated, View, Text, Image, FlatList, StyleSheet, TouchableOpacity, TextInput, ImageBackground, ActivityIndicator, RefreshControl } from 'react-native';
 import { dataFeed, dataGaleri, dataKategori } from '../../../data';
 import { Heart, SearchNormal, Add } from 'iconsax-react-native';
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import axios from 'axios';
+import firestore from '@react-native-firebase/firestore'
 
 const Card = ({ id, title, image }) => {
   const navigation = useNavigation();
@@ -60,31 +61,67 @@ const FeedScreen = () => {
   const [loading, setLoading] = useState(true);
   const [feedData, setFeedData] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
-  const getFeedData = async () => {
-    try {
-      const response = await axios.get(
-        'https://6567ff729927836bd973fac3.mockapi.io/Almustrand/DataFeed',
-      );
-      setFeedData(response.data);
-      setLoading(false)
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  useEffect(() => {
+    const subscriber = firestore()
+      .collection('feed')
+      .onSnapshot(querySnapshot => {
+        const blogs = [];
+        querySnapshot.forEach(documentSnapshot => {
+          blogs.push({
+            ...documentSnapshot.data(),
+            id: documentSnapshot.id,
+          });
+        });
+        setFeedData(blogs);
+        setLoading(false);
+      });
+    return () => subscriber();
+  }, []);
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
     setTimeout(() => {
-      getFeedData()
+      firestore()
+        .collection('blog')
+        .onSnapshot(querySnapshot => {
+          const blogs = [];
+          querySnapshot.forEach(documentSnapshot => {
+            blogs.push({
+              ...documentSnapshot.data(),
+              id: documentSnapshot.id,
+            });
+          });
+          setFeedData(blogs);
+        });
       setRefreshing(false);
     }, 1500);
   }, []);
 
-  useFocusEffect(
-    useCallback(() => {
-      getFeedData();
-    }, [])
-  );
+  // const getFeedData = async () => {
+  //   try {
+  //     const response = await axios.get(
+  //       'https://6567ff729927836bd973fac3.mockapi.io/Almustrand/DataFeed',
+  //     );
+  //     setFeedData(response.data);
+  //     setLoading(false)
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // };
+
+  // const onRefresh = useCallback(() => {
+  //   setRefreshing(true);
+  //   setTimeout(() => {
+  //     getFeedData()
+  //     setRefreshing(false);
+  //   }, 1500);
+  // }, []);
+
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     getFeedData();
+  //   }, [])
+  // );
   const scrollY = useRef(new Animated.Value(0)).current;
   const diffClampY = Animated.diffClamp(scrollY, 0, 120);
   const headerY = diffClampY.interpolate({

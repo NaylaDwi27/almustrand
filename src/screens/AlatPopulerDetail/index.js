@@ -5,6 +5,8 @@ import { useNavigation } from '@react-navigation/native';
 import { dataAlatPopuler } from '../../../data';
 import axios from 'axios';
 import ActionSheet from 'react-native-actions-sheet';
+import firestore from '@react-native-firebase/firestore';
+import storage from '@react-native-firebase/storage';
 
 const AlatPopulerDetail = ({ route }) => {
   const { blogId } = route.params;
@@ -20,36 +22,75 @@ const AlatPopulerDetail = ({ route }) => {
   const closeActionSheet = () => {
     actionSheetRef.current?.hide();
   };
-  useEffect(() => {
-    getBlogById();
-  }, [blogId]);
+  // useEffect(() => {
+  //   getBlogById();
+  // }, [blogId]);
 
-  const getBlogById = async () => {
-    try {
-      const response = await axios.get(
-        `https://6567ff729927836bd973fac3.mockapi.io/Almustrand/DataFeed/${blogId}`,
-      );
-      setSelectedBlog(response.data);
-      setLoading(false);
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  // const getBlogById = async () => {
+  //   try {
+  //     const response = await axios.get(
+  //       `https://6567ff729927836bd973fac3.mockapi.io/Almustrand/DataFeed/${blogId}`,
+  //     );
+  //     setSelectedBlog(response.data);
+  //     setLoading(false);
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // };
+  useEffect(() => {
+    const subscriber = firestore()
+      .collection('feed')
+      .doc(blogId)
+      .onSnapshot(documentSnapshot => {
+        const blogData = documentSnapshot.data();
+        if (blogData) {
+          console.log('Blog data: ', blogData);
+          setSelectedBlog(blogData);
+        } else {
+          console.log(`Blog with ID ${blogId} not found.`);
+        }
+      });
+    setLoading(false);
+    return () => subscriber();
+  }, [blogId]);
 
   const navigateEdit = () => {
     closeActionSheet()
     navigation.navigate('EditFeed', { blogId })
   }
+  // const handleDelete = async () => {
+  //   await axios.delete(`https://6567ff729927836bd973fac3.mockapi.io/Almustrand/DataFeed/${blogId}`)
+  //     .then(() => {
+  //       closeActionSheet()
+  //       navigation.navigate('Explore');
+  //     })
+  //     .catch((error) => {
+  //       console.error(error);
+  //     });
+  // }
   const handleDelete = async () => {
-    await axios.delete(`https://6567ff729927836bd973fac3.mockapi.io/Almustrand/DataFeed/${blogId}`)
-      .then(() => {
-        closeActionSheet()
-        navigation.navigate('Explore');
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  }
+    setLoading(true);
+    try {
+      await firestore()
+        .collection('feed')
+        .doc(blogId)
+        .delete()
+        .then(() => {
+          console.log('Feed deleted!');
+        });
+      if (selectedBlog?.image) {
+        const imageRef = storage().refFromURL(selectedBlog?.image);
+        await imageRef.delete();
+      }
+      console.log('Feed deleted!');
+      closeActionSheet();
+      setSelectedBlog(null);
+      setLoading(false)
+      navigation.navigate('Explore');
+    } catch (error) {
+      console.error(error);
+    }
+  };
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -74,7 +115,7 @@ const AlatPopulerDetail = ({ route }) => {
           <Image
             style={styles.image}
             source={{
-              uri: selectedBlog.image,
+              uri: selectedBlog?.image,
             }}
             resizeMode={'cover'} />
           <TouchableOpacity onPress={openActionSheet}>
@@ -86,8 +127,8 @@ const AlatPopulerDetail = ({ route }) => {
           <DocumentDownload color={'black'} variant="Linear" size={24} />
           <Paperclip2 color={'black'} variant="Linear" size={24} />
         </View>
-        <Text style={styles.title}>{selectedBlog.title}</Text>
-        <Text style={styles.content}>{selectedBlog.description}</Text>
+        <Text style={styles.title}>{selectedBlog?.title}</Text>
+        <Text style={styles.content}>{selectedBlog?.description}</Text>
       </ScrollView>)
       }
       <ActionSheet
