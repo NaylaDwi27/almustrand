@@ -1,32 +1,84 @@
 import { Setting } from 'iconsax-react-native';
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, Image, StyleSheet, ImageBackground, TouchableOpacity, FlatList, ScrollView } from 'react-native';
 import { SafeAreaView } from "react-native-safe-area-context";
 import { dataFeed } from '../../../data';
+import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import ActionSheet from 'react-native-actions-sheet';
+import { useNavigation } from '@react-navigation/native';
 
 const ProfileScreen = () => {
+  const navigation = useNavigation();
+  const [profileData, setProfileData] = useState(null);
+  const actionSheetRef = useRef(null);
+  const openActionSheet = () => {
+    actionSheetRef.current?.show();
+  };
+  const closeActionSheet = () => {
+    actionSheetRef.current?.hide();
+  };
+  useEffect(() => {
+    const user = auth().currentUser;
+    const fetchProfileData = () => {
+      try {
+        const user = auth().currentUser;
+        if (user) {
+          const userId = user.uid;
+          const userRef = firestore().collection('users').doc(userId);
+
+          const unsubscribeProfile = userRef.onSnapshot(doc => {
+            if (doc.exists) {
+              const userData = doc.data();
+              setProfileData(userData);
+            } else {
+              console.error('Dokumen pengguna tidak ditemukan.');
+            }
+          });
+
+          return () => {
+            unsubscribeProfile();
+          };
+        }
+      } catch (error) {
+        console.error('Error fetching profile data:', error);
+      }
+    };
+    fetchProfileData();
+  }, []);
+  const handleLogout = async () => {
+    try {
+      closeActionSheet();
+      await auth().signOut();
+      await AsyncStorage.removeItem('userData');
+      navigation.replace('Login');
+    } catch (error) {
+      console.error(error);
+    }
+  };
   return (
     <View style={styles.container}>
       <ScrollView>
         <ImageBackground style={styles.imageBanner} resizeMode='cover' source={{ uri: 'https://images.unsplash.com/photo-1671636791627-a5b55434aadb?auto=format&fit=crop&q=80&w=1887&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' }}>
-          <View style={styles.iconContainer}>
+          <TouchableOpacity onPress={openActionSheet} style={styles.iconContainer}>
             <Setting color={'white'} variant="Linear" size={25} />
-          </View>
+          </TouchableOpacity>
         </ImageBackground>
         <View style={{ flex: 1, backgroundColor: 'white' }}>
           <View style={styles.imageContainer}>
             <Image
               source={{
-                uri: 'https://templates.iqonic.design/sofbox-admin/sofbox-dashboard-html/html/images/user/02.jpg',
+                uri: profileData?.photoUrl,
               }}
               style={{ ...styles.profileImage }}
             />
           </View>
           <View>
-            <Text style={styles.profileName}>Nayla Dwi</Text>
+            <Text style={styles.profileName}>{profileData?.fullName}</Text>
           </View>
           <View style={{ alignItems: 'center', marginTop: 10, }}>
-            <Text style={styles.profileNumber}>35</Text>
+            <Text style={styles.profileNumber}>{profileData?.followingCount}</Text>
             <Text style={styles.profileInfo}>Mengikuti</Text>
           </View>
           <View style={{ alignItems: 'center', marginTop: 10, }}>
@@ -46,7 +98,7 @@ const ProfileScreen = () => {
           <View style={{
             paddingHorizontal: 24,
             flexDirection: 'row',
-            flexWrap: 'wrap', 
+            flexWrap: 'wrap',
             justifyContent: 'space-between',
             marginTop: 20,
           }}>
@@ -61,6 +113,50 @@ const ProfileScreen = () => {
           </View>
         </View>
       </ScrollView>
+      <ActionSheet
+        ref={actionSheetRef}
+        containerStyle={{
+          borderTopLeftRadius: 25,
+          borderTopRightRadius: 25,
+        }}
+        indicatorStyle={{
+          width: 100,
+        }}
+        gestureEnabled={true}
+        defaultOverlayOpacity={0.3}>
+        <TouchableOpacity
+          style={{
+            justifyContent: 'center',
+            alignItems: 'center',
+            paddingVertical: 15,
+          }}
+          onPress={handleLogout}>
+          <Text
+            style={{
+              
+              color: 'black',
+              fontSize: 18,
+            }}>
+            Log out
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={{
+            justifyContent: 'center',
+            alignItems: 'center',
+            paddingVertical: 15,
+          }}
+          onPress={closeActionSheet}>
+          <Text
+            style={{
+              
+              color: 'red',
+              fontSize: 18,
+            }}>
+            Cancel
+          </Text>
+        </TouchableOpacity>
+      </ActionSheet>
     </View>
   );
 };
@@ -81,8 +177,8 @@ const styles = StyleSheet.create({
     borderRadius: 15,
   },
   card: {
-    width: '48%', 
-    marginVertical: 5, 
+    width: '48%',
+    marginVertical: 5,
     borderRadius: 8,
     overflow: 'hidden',
   },
